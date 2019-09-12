@@ -3,7 +3,6 @@
 
     public class ScrcpyArguments
     {
-        private bool _useNoControl = false;
 
         private bool _useCrop = false;
         private int _cropWidth = 0;
@@ -19,12 +18,12 @@
 
         private bool _useSerial = false;
         private string _serial = string.Empty;
+        public bool NoControl { get; set; }
+        public bool TurnScreenOff { get; set; }
 
 
-        public ScrcpyArguments(bool noControl = false, int cropWidth = -1, int cropHeigth = -1, int cropX = -1, int cropY = -1, int maxSize = -1, int bitrate = -1, string serial = "")
+        public ScrcpyArguments(int cropWidth = -1, int cropHeigth = -1, int cropX = -1, int cropY = -1, int maxSize = -1, int bitrate = -1, string serial = "")
         {
-            // set nocontrol argument
-            _useNoControl = noControl;
             // set crop argument values
             if (cropWidth != -1 && cropHeigth != -1
                 && cropX != -1 && cropY != -1)
@@ -58,9 +57,12 @@
         public override string ToString()
         {
             string result = string.Empty;
-            if (_useNoControl)
+            if (this.NoControl)
                 // disable any remote input to the connected device
                 result += Constants.SCRCPY_ARG_NOCONTROL;
+            if (this.TurnScreenOff)
+                // disable any remote input to the connected device
+                result += Constants.SCRCPY_ARG_TURNSCREENOFF;
 
             if (_useCrop)
                 // apply cropping to the projected display

@@ -42,6 +42,7 @@ namespace NoXP.Scrcpy
         public const string SCRCPY_ARG_BITRATE = "--bit-rate {0}M "; // use with string.Format to fill video bitrate (in Mb/s, default is 8 Mb/s)
         public const string SCRCPY_ARG_CROP = "--crop {0}:{1}:{2}:{3} "; // use with string.Format to fill in cropping area (width, height, x-offset, y-offset)
         public const string SCRCPY_ARG_NOCONTROL = "--no-control "; // use this to disable inputs from the scrcpy
+        public const string SCRCPY_ARG_TURNSCREENOFF = "--turn-screen-off "; // use this to disable the devices screen
 
 
         public static readonly string[] SeparatorNewLine = new string[] { Environment.NewLine };

@@ -66,7 +66,8 @@ namespace NoXP.Scrcpy
 
                 if (currentDevice != null)
                 {
-                    ScrcpyArguments arguments = new ScrcpyArguments(false, -1, -1, -1, -1, 1280, -1, currentDevice.Serial);
+                    ScrcpyArguments arguments = new ScrcpyArguments(-1, -1, -1, -1, 1280, -1, currentDevice.Serial);
+                    arguments.TurnScreenOff = true;
                     StartScrcpy(arguments);
                 }
 
@@ -93,7 +94,7 @@ namespace NoXP.Scrcpy
 
         private static void ProcessCommand(string command)
         {
-            
+
         }
 
 
