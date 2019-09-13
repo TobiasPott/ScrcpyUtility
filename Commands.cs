@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 
 namespace NoXP.Scrcpy
@@ -79,21 +80,20 @@ namespace NoXP.Scrcpy
                     if (device.IsConnected) Console.ForegroundColor = ConsoleColor.Green;
                     if (_currentDevice == device) selectedMark = '*';
 
-                    Console.WriteLine(string.Format(selectedMark + " [{0,3}] {1}", i, device));
+                    Console.WriteLine("  " + string.Format(selectedMark + " [{0,3}] {1}", i, device));
                     Console.ResetColor();
                 }
             }
             else
             {
-                Console.ForegroundColor = ConsoleColor.Yellow;
-                Console.WriteLine("No devices connected. Connect an android device with enabled debugging and restart this application.");
-                Console.ResetColor();
+                Console.WriteLine("  No devices connected. Connect an android device with enabled debugging and restart this application.");
                 return;
             }
             Console.WriteLine();
         }
         public static void RunClear()
         {
+            Console.ResetColor();
             Console.Clear();
         }
 
@@ -109,26 +109,23 @@ namespace NoXP.Scrcpy
                 string output = proc.StandardOutput.ReadToEnd();
                 string[] lines = output.Split(Constants.SeparatorNewLine, StringSplitOptions.RemoveEmptyEntries);
 
+                List<ADBDevice> newDevices = new List<ADBDevice>();
                 if (lines.Length > 1)
                 {
                     for (int i = 1; i < lines.Length; i++)
                     {
                         string[] deviceInfo = lines[i].Split(Constants.SeparatorWhitespace, 2);
-                        string devSerial = deviceInfo[0];
-                        string devName = deviceInfo[1];
-
-
-                        if (ADBDevice.AllDevices.Find((x) => x.Serial.Equals(devSerial)) == null)
-                            ADBDevice.AllDevices.Add(new ADBDevice(devSerial, devName));
-                        // retrieve the device (not ideal as ins some cases the recently added could be used)
-                        ADBDevice device = ADBDevice.AllDevices.Find((x) => x.Serial.Equals(devSerial));
-                        Commands.GetDevicesIpAddress(device);
+                        newDevices.Add(new ADBDevice(deviceInfo[0], deviceInfo[1]));
                     }
                 }
+                ADBDevice.UpdateAllDevices(newDevices);
+                // if only one device is available select it as current by default
+                if (ADBDevice.AllDevices.Count == 1)
+                    Commands.RunSelectDevice(true);
             }
 
         }
-        private static void GetDevicesIpAddress(ADBDevice device)
+        public static void GetDevicesIpAddress(ADBDevice device)
         {
             if (!string.IsNullOrEmpty(Constants.ADB)
                 && device != null)
