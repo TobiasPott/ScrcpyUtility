@@ -8,7 +8,7 @@
     <RuntimeIdentifiers>win10-x64,linux-x64</RuntimeIdentifiers>
     <RootNamespace>NoXP.Scrcpy</RootNamespace>
     <AssemblyName>ScrcpyUtility</AssemblyName>
-    <Version>0.1.0</Version>
+    <Version>0.2.0</Version>
     <Authors>Tobias Pott</Authors>
     <Company>Tobias Pott</Company>
     <Copyright></Copyright>
