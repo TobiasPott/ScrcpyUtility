@@ -10,19 +10,15 @@
         private int _cropX = 0;
         private int _cropY = 0;
 
-        private bool _useMaxSize = false;
-        private int _maxSize = 0;
-
-        private bool _useBitrate = false;
-        private int _bitrate = 0;
-
-        private bool _useSerial = false;
-        private string _serial = string.Empty;
         public bool NoControl { get; set; }
         public bool TurnScreenOff { get; set; }
 
+        public int MaxSize { get; set; } = 0;
+        public int Bitrate { get; set; } = 0;
+        public string Serial { get; set; } = "";
 
-        public ScrcpyArguments(int cropWidth = -1, int cropHeigth = -1, int cropX = -1, int cropY = -1, int maxSize = -1, int bitrate = -1, string serial = "")
+
+        public ScrcpyArguments(int cropWidth = -1, int cropHeigth = -1, int cropX = -1, int cropY = -1)
         {
             // set crop argument values
             if (cropWidth != -1 && cropHeigth != -1
@@ -33,24 +29,6 @@
                 _cropHeight = cropHeigth;
                 _cropX = cropX;
                 _cropY = cropY;
-            }
-            // set max size argument
-            if (maxSize != -1)
-            {
-                _useMaxSize = true;
-                _maxSize = maxSize;
-            }
-            // set bitrate argument
-            if (bitrate != -1)
-            {
-                _useBitrate = true;
-                _bitrate = bitrate;
-            }
-            // set bitrate argument
-            if (string.IsNullOrEmpty(serial))
-            {
-                _useSerial = true;
-                _serial = serial;
             }
         }
 
@@ -68,17 +46,17 @@
                 // apply cropping to the projected display
                 result += string.Format(Constants.SCRCPY_ARG_CROP, _cropWidth, _cropHeight, _cropX, _cropY);
 
-            if (_useMaxSize)
+            if (this.MaxSize > 0)
                 // set max size 
-                result += string.Format(Constants.SCRCPY_ARG_MAXSIE, _maxSize);
+                result += string.Format(Constants.SCRCPY_ARG_MAXSIE, this.MaxSize);
 
-            if (_useBitrate)
+            if (this.Bitrate > 0)
                 // set bit rate 
-                result += string.Format(Constants.SCRCPY_ARG_BITRATE, _bitrate);
+                result += string.Format(Constants.SCRCPY_ARG_BITRATE, this.Bitrate);
 
-            if (_useSerial)
+            if (!string.IsNullOrEmpty(this.Serial))
                 // set serial 
-                result += string.Format(Constants.SCRCPY_ARG_SERIAL, _serial);
+                result += string.Format(Constants.SCRCPY_ARG_SERIAL, this.Serial);
 
             return result;
         }

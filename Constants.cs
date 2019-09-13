@@ -47,6 +47,7 @@ namespace NoXP.Scrcpy
 
         public static readonly string[] SeparatorNewLine = new string[] { Environment.NewLine };
         public static readonly char[] SeparatorWhitespace = new char[] { ' ', '\t' };
+
     }
 
 }
