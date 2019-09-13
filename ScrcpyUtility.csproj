@@ -8,6 +8,52 @@
     <RuntimeIdentifiers>win10-x64,linux-x64</RuntimeIdentifiers>
     <RootNamespace>NoXP.Scrcpy</RootNamespace>
     <AssemblyName>ScrcpyUtility</AssemblyName>
+    <Version>0.2.0</Version>
+    <Authors>Tobias Pott</Authors>
+    <Company>Tobias Pott</Company>
+    <Copyright></Copyright>
+    <PackageProjectUrl>https://github.com/TobiasPott/ScrcpyUtility</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/TobiasPott/ScrcpyUtility</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Update="scrcpy-win-x64\adb.exe">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="scrcpy-win-x64\AdbWinApi.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="scrcpy-win-x64\AdbWinUsbApi.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="scrcpy-win-x64\avcodec-58.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="scrcpy-win-x64\avformat-58.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="scrcpy-win-x64\avutil-56.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="scrcpy-win-x64\scrcpy-noconsole.exe">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="scrcpy-win-x64\scrcpy-server.jar">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="scrcpy-win-x64\scrcpy.exe">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="scrcpy-win-x64\SDL2.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="scrcpy-win-x64\swresample-3.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="scrcpy-win-x64\swscale-5.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
 
 </Project>

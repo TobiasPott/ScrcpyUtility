@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.InteropServices;
 
 namespace NoXP.Scrcpy
 {
@@ -9,45 +10,55 @@ namespace NoXP.Scrcpy
 
         private static void Main(string[] args)
         {
+            Console.BufferWidth = Math.Min(Console.LargestWindowWidth, 150);
+            Console.WindowWidth = Math.Min(Console.LargestWindowWidth, 150);
+
             if (args.Length > 0)
-            {
-                Console.BufferWidth = Math.Min(Console.LargestWindowWidth, 150);
-                Console.WindowWidth = Math.Min(Console.LargestWindowWidth, 150);
-
                 ProcessFactory.BasePath = args[0];
-                Console.WriteLine("Utility is using '" + ProcessFactory.BasePath + "' as the path to your scrcpy-installation.");
+            else
+                ProcessFactory.BasePath = Program.GetFallbackPath();
 
-                // preset the scrcpy arguments with some default values
-                Commands.Arguments.NoControl = false;
-                Commands.Arguments.TurnScreenOff = true;
-                Commands.Arguments.MaxSize = 1280;
-                // prefills the list of devices available on this machine
-                Commands.RunGetAvailableDevices();
-                Commands.RunSelectDevice(true);
+            Console.WriteLine("Utility is using '" + ProcessFactory.BasePath + "' as the path to your scrcpy-installation.");
 
-                do
-                {
-                    Console.WriteLine("Please enter your command (type 'quit' to terminate the application).");
-                    Console.Write("> ");
+            // preset the scrcpy arguments with some default values
+            Commands.Arguments.NoControl = false;
+            Commands.Arguments.TurnScreenOff = true;
+            Commands.Arguments.MaxSize = 1280;
+            // prefills the list of devices available on this machine
+            Commands.RunGetAvailableDevices();
+            Commands.RunSelectDevice(true);
 
-                    _command = Console.ReadLine();
-                    Program.ProcessCommand(_command);
-                }
-                while (!_command.Equals(Commands.CMD_Quit));
+            do
+            {
+                Console.WriteLine("Please enter your command (type 'quit' to terminate the application).");
+                Console.Write("> ");
 
-                // terminate all scrcpy processes running for available devices
-                foreach (ADBDevice device in ADBDevice.AllDevices)
-                {
-                    if (device.IsConnected)
-                    {
-                        device.Process.CloseMainWindow();
-                        device.Process.Kill();
-                    }
-                }
-
+                _command = Console.ReadLine();
+                Program.ProcessCommand(_command);
             }
+            while (!_command.Equals(Commands.CMD_Quit));
+
+            // terminate all scrcpy processes running for available devices
+            foreach (ADBDevice device in ADBDevice.AllDevices)
+            {
+                if (device.IsConnected)
+                {
+                    device.Process.CloseMainWindow();
+                    device.Process.Kill();
+                }
+            }
+
         }
 
+        private static string GetFallbackPath()
+        {
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                if (RuntimeInformation.OSArchitecture == Architecture.X64)
+                    return "scrcpy-win-x64";
+            }
+            return string.Empty;
+        }
 
         private static void ProcessCommand(string command)
         {
