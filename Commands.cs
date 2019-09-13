@@ -60,6 +60,7 @@ namespace NoXP.Scrcpy
                 Arguments.Serial = _currentDevice.Serial;
                 ConnectScrcpy(_currentDevice, Arguments);
             }
+            Console.WriteLine();
         }
         public static void RunGetAvailableDevices()
         {
