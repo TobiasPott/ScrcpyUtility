@@ -5,8 +5,15 @@ namespace NoXP.Scrcpy
 {
     public class ADBDevice
     {
-        public static List<ADBDevice> AllDevices { get; } = new List<ADBDevice>();
+        private static ADBDevice _currentDevice = null;
+        private static List<ADBDevice> AllDevices { get; } = new List<ADBDevice>();
 
+        public static IEnumerable<ADBDevice> AllDevicesCollection { get => AllDevices; }
+
+        public static ADBDevice CurrentDevice
+        { get => _currentDevice; }
+        public static int NumberOfDevices
+        { get => AllDevices.Count; }
 
 
         public string Serial { get; }
@@ -42,6 +49,13 @@ namespace NoXP.Scrcpy
             return string.Format("{0}: [{1}] \tIP:{2}", this.Serial, this.IsConnected ? "Connected" : "Disconnected", this.IpAddress);
         }
 
+        public static void SetCurrentDevice(int index)
+        {
+            if (index != -1 && index < ADBDevice.AllDevices.Count)
+                _currentDevice = ADBDevice.AllDevices[index];
+            else
+                _currentDevice = null;
+        }
         public static void UpdateAllDevices(List<ADBDevice> newDevices)
         {
             for (int i = AllDevices.Count - 1; i >= 0; i--)

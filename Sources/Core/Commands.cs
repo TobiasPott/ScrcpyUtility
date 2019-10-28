@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 
 namespace NoXP.Scrcpy
 {
@@ -19,10 +20,6 @@ namespace NoXP.Scrcpy
         public const string CMD_SetNoControl = "setNoControl";
         public const string CMD_SetTurnScreenOff = "setTurnScreenOff";
 
-
-
-        private static ADBDevice _currentDevice = null;
-        private static int _currentDeviceIndex = -1;
 
         public static ScrcpyArguments Arguments { get; } = new ScrcpyArguments();
 
@@ -43,11 +40,11 @@ namespace NoXP.Scrcpy
         public static void RunSelectDevice(bool auto = false)
         {
             // select device by index (this will be put into a loop later on)
-            _currentDevice = Commands.SelectDevice(auto);
+            Commands.SelectDevice(auto);
             if (!auto)
             {
-                if (_currentDevice != null)
-                    Console.WriteLine(string.Format("Selected: {0}", _currentDevice));
+                if (ADBDevice.CurrentDevice != null)
+                    Console.WriteLine(string.Format("Selected: {0}", ADBDevice.CurrentDevice));
                 else
                     Console.WriteLine("No device selected.");
                 Console.WriteLine();
@@ -55,10 +52,10 @@ namespace NoXP.Scrcpy
         }
         public static void RunConnectToDevice()
         {
-            if (_currentDevice != null && !_currentDevice.IsConnected)
+            if (ADBDevice.CurrentDevice != null && !ADBDevice.CurrentDevice.IsConnected)
             {
-                Arguments.Serial = _currentDevice.Serial;
-                ConnectScrcpy(_currentDevice, Arguments);
+                Arguments.Serial = ADBDevice.CurrentDevice.Serial;
+                ConnectScrcpy(ADBDevice.CurrentDevice, Arguments);
             }
             Console.WriteLine();
         }
@@ -71,18 +68,19 @@ namespace NoXP.Scrcpy
         public static void RunListAvailableDevices()
         {
             Console.WriteLine("Devices available on this machine:");
-            if (ADBDevice.AllDevices.Count > 0)
+            if (ADBDevice.AllDevicesCollection.Count() > 0)
             {
-                for (int i = 0; i < ADBDevice.AllDevices.Count; i++)
+                int i = 0;
+                foreach (ADBDevice device in ADBDevice.AllDevicesCollection)
                 {
-                    ADBDevice device = ADBDevice.AllDevices[i];
                     char selectedMark = ' ';
 
                     if (device.IsConnected) Console.ForegroundColor = ConsoleColor.Green;
-                    if (_currentDevice == device) selectedMark = '*';
+                    if (ADBDevice.CurrentDevice == device) selectedMark = '*';
 
                     Console.WriteLine("  " + string.Format(selectedMark + " [{0,3}] {1}", i, device));
                     Console.ResetColor();
+                    i++;
                 }
             }
             else
@@ -121,7 +119,7 @@ namespace NoXP.Scrcpy
                 }
                 ADBDevice.UpdateAllDevices(newDevices);
                 // if only one device is available select it as current by default
-                if (ADBDevice.AllDevices.Count == 1)
+                if (ADBDevice.NumberOfDevices == 1)
                     Commands.RunSelectDevice(true);
             }
 
@@ -257,7 +255,7 @@ namespace NoXP.Scrcpy
             }
             return false;
         }
-        private static ADBDevice SelectDevice(bool auto = false)
+        private static void SelectDevice(bool auto = false)
         {
             if (!auto)
             {
@@ -266,29 +264,25 @@ namespace NoXP.Scrcpy
                 Console.Write("> ");
             }
             string input = auto ? "" : Console.ReadLine();
+            int currentDeviceIndex = 0;
             if (string.IsNullOrEmpty(input))
             {
-                if (ADBDevice.AllDevices.Count > 0)
-                    _currentDeviceIndex = 0;
+                if (ADBDevice.NumberOfDevices > 0)
+                    currentDeviceIndex = 0;
                 else
-                    _currentDeviceIndex = -1; // invlaidates the index
+                    currentDeviceIndex = -1; // invlaidates the index
             }
             else
             {
                 int deviceIndex = -1;
                 if (int.TryParse(input, out deviceIndex))
-                    _currentDeviceIndex = deviceIndex;
+                    currentDeviceIndex = deviceIndex;
 
                 // invalidate index if out ouf device list range
-                if (_currentDeviceIndex < 0 || _currentDeviceIndex >= ADBDevice.AllDevices.Count)
-                    _currentDeviceIndex = -1;
+                if (currentDeviceIndex < 0 || currentDeviceIndex >= ADBDevice.NumberOfDevices)
+                    currentDeviceIndex = -1;
             }
-
-            if (_currentDeviceIndex != -1)
-                return ADBDevice.AllDevices[_currentDeviceIndex];
-            else
-                return null;
-
+            ADBDevice.SetCurrentDevice(currentDeviceIndex);
         }
         private static bool ConnectADBDeviceOverWifi(ADBDevice device)
         {

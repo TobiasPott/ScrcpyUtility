@@ -1,0 +1,24 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp3.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="scrcpy-win-x64\**" />
+    <Compile Remove="Sources\Core\**" />
+    <Compile Remove="Sources\UI\**" />
+    <EmbeddedResource Remove="scrcpy-win-x64\**" />
+    <EmbeddedResource Remove="Sources\Core\**" />
+    <EmbeddedResource Remove="Sources\UI\**" />
+    <None Remove="scrcpy-win-x64\**" />
+    <None Remove="Sources\Core\**" />
+    <None Remove="Sources\UI\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="ScrcpyUtility.csproj" />
+  </ItemGroup>
+
+</Project>

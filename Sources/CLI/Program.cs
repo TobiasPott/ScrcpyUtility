@@ -1,7 +1,6 @@
 ﻿using System;
-using System.Runtime.InteropServices;
 
-namespace NoXP.Scrcpy
+namespace NoXP.Scrcpy.CLI
 {
     internal class Program
     {
@@ -13,11 +12,7 @@ namespace NoXP.Scrcpy
             Console.BufferWidth = Math.Min(Console.LargestWindowWidth, 150);
             Console.WindowWidth = Math.Min(Console.LargestWindowWidth, 150);
 
-            if (args.Length > 0)
-                ProcessFactory.BasePath = args[0];
-            else
-                ProcessFactory.BasePath = Program.GetFallbackPath();
-
+            ProcessFactory.SetBasePath(args.Length > 0 ? args[0] : string.Empty);
             Console.WriteLine("Utility is using '" + ProcessFactory.BasePath + "' as the path to your scrcpy-installation.");
 
             // preset the scrcpy arguments with some default values
@@ -39,7 +34,7 @@ namespace NoXP.Scrcpy
             while (!_command.Equals(Commands.CMD_Quit));
 
             // terminate all scrcpy processes running for available devices
-            foreach (ADBDevice device in ADBDevice.AllDevices)
+            foreach (ADBDevice device in ADBDevice.AllDevicesCollection)
             {
                 if (device.IsConnected)
                 {
@@ -48,16 +43,6 @@ namespace NoXP.Scrcpy
                 }
             }
 
-        }
-
-        private static string GetFallbackPath()
-        {
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-            {
-                if (RuntimeInformation.OSArchitecture == Architecture.X64)
-                    return "scrcpy-win-x64";
-            }
-            return string.Empty;
         }
 
         private static void ProcessCommand(string command)
