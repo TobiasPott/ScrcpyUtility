@@ -69,10 +69,9 @@ namespace NoXP.Scrcpy
             }
             Console.WriteLine();
         }
-
         public static void RunGetAvailableDevices()
         {
-            Commands.GetDevices();
+            ADBDevice.GetAvailableDevices();
             Console.WriteLine("Available devices updated.");
             Console.WriteLine();
         }
@@ -107,36 +106,6 @@ namespace NoXP.Scrcpy
             Console.Clear();
         }
 
-
-
-        private static void GetDevices()
-        {
-            if (!string.IsNullOrEmpty(Constants.ADB))
-            {
-                Process proc = ProcessFactory.CreateProcessADB(Constants.ADB_COMMAND_DEVICES);
-                proc.Start();
-
-                string output = proc.StandardOutput.ReadToEnd();
-                string[] lines = output.Split(Constants.SeparatorNewLine, StringSplitOptions.RemoveEmptyEntries);
-
-                List<ADBDevice> newDevices = new List<ADBDevice>();
-                if (lines.Length > 1)
-                {
-                    for (int i = 1; i < lines.Length; i++)
-                    {
-                        string[] deviceInfo = lines[i].Split(Constants.SeparatorWhitespace, 2);
-                        newDevices.Add(new ADBDevice(deviceInfo[0], deviceInfo[1]));
-                    }
-                }
-                ADBDevice.UpdateAllDevices(newDevices);
-                // TODO:
-                //  put this behind a configurable value to allow the user/application to decide whether auto-connect should be used or not
-                // if only one device is available select it as current by default
-                if (ADBDevice.NumberOfDevices == 1)
-                    ADBDevice.SelectDevice(0);
-            }
-
-        }
         public static void GetDevicesIpAddress(ADBDevice device)
         {
             if (!string.IsNullOrEmpty(Constants.ADB)
@@ -149,7 +118,6 @@ namespace NoXP.Scrcpy
                 }
 
             }
-
         }
         private static bool GetDeviceIpAddressFromIfconfig(ADBDevice device)
         {

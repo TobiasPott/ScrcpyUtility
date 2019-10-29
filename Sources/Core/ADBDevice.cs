@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 
 namespace NoXP.Scrcpy
@@ -103,7 +104,36 @@ namespace NoXP.Scrcpy
             else
                 _currentDevice = null;
         }
-        public static void UpdateAllDevices(List<ADBDevice> newDevices)
+
+        public static void GetAvailableDevices()
+        {
+            if (!string.IsNullOrEmpty(Constants.ADB))
+            {
+                Process proc = ProcessFactory.CreateProcessADB(Constants.ADB_COMMAND_DEVICES);
+                proc.Start();
+
+                string output = proc.StandardOutput.ReadToEnd();
+                string[] lines = output.Split(Constants.SeparatorNewLine, StringSplitOptions.RemoveEmptyEntries);
+
+                List<ADBDevice> newDevices = new List<ADBDevice>();
+                if (lines.Length > 1)
+                {
+                    for (int i = 1; i < lines.Length; i++)
+                    {
+                        string[] deviceInfo = lines[i].Split(Constants.SeparatorWhitespace, 2);
+                        newDevices.Add(new ADBDevice(deviceInfo[0], deviceInfo[1]));
+                    }
+                }
+                ADBDevice.UpdateAllDevices(newDevices);
+                // TODO:
+                //  put this behind a configurable value to allow the user/application to decide whether auto-connect should be used or not
+                // if only one device is available select it as current by default
+                if (ADBDevice.NumberOfDevices == 1)
+                    ADBDevice.SelectDevice(0);
+            }
+
+        }
+        private static void UpdateAllDevices(List<ADBDevice> newDevices)
         {
             for (int i = AllDevices.Count - 1; i >= 0; i--)
             {
