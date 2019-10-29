@@ -21,6 +21,7 @@ namespace NoXP.Scrcpy
         public string Name { get; }
         public string IpAddress { get; set; }
         public ushort Port { get; set; } = 5555;
+        public bool TCPIPEnabled { get; set; } = false;
 
         public Process Process { get; set; }
         public ScrcpyArguments Arguments { get; private set; }
@@ -49,7 +50,7 @@ namespace NoXP.Scrcpy
             if (arguments != null)
             {
                 this.Arguments = arguments.Clone() as ScrcpyArguments;
-                this.Arguments.Serial = this.Serial;
+                //this.Arguments.Serial = this.Serial;
             }
         }
 
@@ -63,7 +64,7 @@ namespace NoXP.Scrcpy
             if (!this.IsConnected && !string.IsNullOrEmpty(Constants.SCRCPY))
             {
                 this.SetScrcpyArguments(arguments);
-                Process proc = ProcessFactory.CreateProcessScrcpy(this.Arguments);
+                Process proc = ProcessFactory.CreateProcessScrcpy(this.Arguments, this.TCPIPEnabled ? this.IpAddress : this.Serial);
                 this.Process = proc;
                 return proc.Start();
             }
@@ -90,7 +91,10 @@ namespace NoXP.Scrcpy
 
                 string output = proc.StandardOutput.ReadToEnd().ToLowerInvariant();
                 if (output.StartsWith(Restarting))
+                {
+                    this.TCPIPEnabled = true;
                     return true;
+                }
             }
             return false;
         }
@@ -106,13 +110,16 @@ namespace NoXP.Scrcpy
 
                 string output = proc.StandardOutput.ReadToEnd().ToLowerInvariant();
                 if (!output.ToLowerInvariant().Contains(Error))
+                {
+                    this.TCPIPEnabled = false;
                     return true;
+                }
             }
             return false;
         }
         public bool ConnectADBDeviceOverWifi()
         {
-            if (!string.IsNullOrEmpty(Constants.ADB))
+            if (!string.IsNullOrEmpty(Constants.ADB) && this.TCPIPEnabled)
             {
                 const string Connected = "connected ";
                 string arguments = Constants.ADB_COMMAND_CONNECT + " " + this.IpAddress + ":" + this.Port;
@@ -122,6 +129,22 @@ namespace NoXP.Scrcpy
 
                 string output = proc.StandardOutput.ReadToEnd().ToLowerInvariant();
                 if (output.StartsWith(Connected))
+                    return true;
+            }
+            return false;
+        }
+        public bool DisconnectADBDeviceOverWifi()
+        {
+            if (!string.IsNullOrEmpty(Constants.ADB) && this.TCPIPEnabled)
+            {
+                const string Disconnected = "disconnected ";
+                string arguments = Constants.ADB_COMMAND_DISCONNECT + " " + this.IpAddress + ":" + this.Port;
+
+                Process proc = ProcessFactory.CreateProcessADB(arguments);
+                proc.Start();
+
+                string output = proc.StandardOutput.ReadToEnd().ToLowerInvariant();
+                if (output.StartsWith(Disconnected))
                     return true;
             }
             return false;
@@ -165,6 +188,10 @@ namespace NoXP.Scrcpy
                 _currentDevice = null;
         }
 
+        // TODO:
+        //  filter devices which are available due to their connection via TCPIP
+        //      ->  either remove them from the list completely
+        //      ->  or group/combine them with other devices which share the same IP-Address
         public static void GetAvailableDevices()
         {
             if (!string.IsNullOrEmpty(Constants.ADB))
@@ -219,8 +246,6 @@ namespace NoXP.Scrcpy
                 device.GetIpAddress();
 
         }
-
-
 
 
         private static bool GetDeviceIpAddressFromIfconfig(ADBDevice device)

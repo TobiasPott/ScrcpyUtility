@@ -20,7 +20,7 @@ namespace NoXP.Scrcpy
 
         public int MaxSize { get; set; } = 0;
         public int Bitrate { get; set; } = 0;
-        public string Serial { get; set; } = "";
+        //public string Serial { get; set; } = "";
 
 
         public ScrcpyArguments(int cropWidth = -1, int cropHeigth = -1, int cropX = -1, int cropY = -1)
@@ -59,9 +59,9 @@ namespace NoXP.Scrcpy
                 // set bit rate 
                 result += string.Format(Constants.SCRCPY_ARG_BITRATE, this.Bitrate);
 
-            if (!string.IsNullOrEmpty(this.Serial))
-                // set serial 
-                result += string.Format(Constants.SCRCPY_ARG_SERIAL, this.Serial);
+            //if (!string.IsNullOrEmpty(this.Serial))
+            //    // set serial 
+            //    result += string.Format(Constants.SCRCPY_ARG_SERIAL, this.Serial);
 
             return result;
         }
@@ -73,7 +73,7 @@ namespace NoXP.Scrcpy
             clone.TurnScreenOff = this.TurnScreenOff;
             clone.MaxSize = this.MaxSize;
             clone.Bitrate = this.Bitrate;
-            clone.Serial = this.Serial;
+            //clone.Serial = this.Serial;
             return clone;
         }
     }

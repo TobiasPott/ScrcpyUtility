@@ -28,9 +28,13 @@ namespace NoXP.Scrcpy
             }
             return null;
         }
-        public static Process CreateProcessScrcpy(ScrcpyArguments arguments)
+        public static Process CreateProcessScrcpy(ScrcpyArguments arguments, string serial = "")
         {
-            return CreateProcessScrcpy(arguments.ToString());
+            string strArguments = arguments.ToString();
+            if (!string.IsNullOrEmpty(serial))
+                // set serial 
+                strArguments += string.Format(Constants.SCRCPY_ARG_SERIAL, serial);
+            return CreateProcessScrcpy(strArguments);
         }
         public static Process CreateProcessScrcpy(string arguments)
         {

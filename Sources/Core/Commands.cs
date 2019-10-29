@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 
 namespace NoXP.Scrcpy
@@ -16,6 +14,11 @@ namespace NoXP.Scrcpy
         public const string CMD_Clear = "clear";
         public const string CMD_Quit = "quit";
 
+        // untested
+        public const string CMD_ADBMode_TCPIP = "adbmode-tcpip";
+        public const string CMD_ADBMode_USB = "adbmode-usb";
+
+        // not implemented
         public const string CMD_SetMaxSize = "setMaxSize";
         public const string CMD_SetBitrate = "setBitrate";
         public const string CMD_SetNoControl = "setNoControl";
@@ -111,6 +114,25 @@ namespace NoXP.Scrcpy
             Console.Clear();
         }
 
+
+
+
+        public static void RunADBModeTCPIP()
+        {
+            if (ADBDevice.CurrentDevice != null)
+            {
+                ADBDevice.CurrentDevice.SetTCPIPMode();
+                ADBDevice.CurrentDevice.ConnectADBDeviceOverWifi();
+            }
+        }
+        public static void RunADBModeUSB()
+        {
+            if (ADBDevice.CurrentDevice != null)
+            {
+                ADBDevice.CurrentDevice.DisconnectADBDeviceOverWifi();
+                ADBDevice.CurrentDevice.SetUSBMode();
+            }
+        }
     }
 
 }
