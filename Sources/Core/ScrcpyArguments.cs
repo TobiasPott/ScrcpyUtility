@@ -1,14 +1,19 @@
-﻿namespace NoXP.Scrcpy
+﻿using System;
+
+namespace NoXP.Scrcpy
 {
 
-    public class ScrcpyArguments
+    public class ScrcpyArguments : ICloneable
     {
+        public static ScrcpyArguments Global { get; } = new ScrcpyArguments();
+
+
 
         private bool _useCrop = false;
-        private int _cropWidth = 0;
-        private int _cropHeight = 0;
-        private int _cropX = 0;
-        private int _cropY = 0;
+        private int _cropWidth = -1;
+        private int _cropHeight = -1;
+        private int _cropX = -1;
+        private int _cropY = -1;
 
         public bool NoControl { get; set; }
         public bool TurnScreenOff { get; set; }
@@ -61,6 +66,16 @@
             return result;
         }
 
+        public object Clone()
+        {
+            ScrcpyArguments clone = new ScrcpyArguments(this._cropWidth, this._cropHeight, this._cropX, this._cropY);
+            clone.NoControl = this.NoControl;
+            clone.TurnScreenOff = this.TurnScreenOff;
+            clone.MaxSize = this.MaxSize;
+            clone.Bitrate = this.Bitrate;
+            clone.Serial = this.Serial;
+            return clone;
+        }
     }
 
 }

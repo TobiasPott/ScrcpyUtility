@@ -16,9 +16,9 @@ namespace NoXP.Scrcpy.CLI
             Console.WriteLine("Utility is using '" + ProcessFactory.BasePath + "' as the path to your scrcpy-installation.");
 
             // preset the scrcpy arguments with some default values
-            Commands.Arguments.NoControl = false;
-            Commands.Arguments.TurnScreenOff = true;
-            Commands.Arguments.MaxSize = 1280;
+            ScrcpyArguments.Global.NoControl = false;
+            ScrcpyArguments.Global.TurnScreenOff = true;
+            ScrcpyArguments.Global.MaxSize = 1280;
             // prefills the list of devices available on this machine
             Commands.RunGetAvailableDevices();
             ADBDevice.SelectDevice("", true);

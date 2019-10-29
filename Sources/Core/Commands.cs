@@ -21,7 +21,7 @@ namespace NoXP.Scrcpy
         public const string CMD_SetTurnScreenOff = "setTurnScreenOff";
 
 
-        public static ScrcpyArguments Arguments { get; } = new ScrcpyArguments();
+        //public static ScrcpyArguments Arguments { get; } = new ScrcpyArguments();
 
 
         public static void RunShowHelp()
@@ -53,13 +53,15 @@ namespace NoXP.Scrcpy
         }
         public static void RunConnectToDevice()
         {
-            if (ADBDevice.CurrentDevice != null && !ADBDevice.CurrentDevice.IsConnected)
+            if (ADBDevice.CurrentDevice != null)
             {
-                Arguments.Serial = ADBDevice.CurrentDevice.Serial;
-                ConnectScrcpy(ADBDevice.CurrentDevice, Arguments);
+                Console.WriteLine("Trying to connect to: {0}", ADBDevice.CurrentDevice);
+                // pass the global settings to the device as per-device argument editing is not supported for CLI
+                ADBDevice.CurrentDevice.Connect(ScrcpyArguments.Global);
             }
             Console.WriteLine();
         }
+
         public static void RunGetAvailableDevices()
         {
             Commands.GetDevices();
@@ -242,6 +244,20 @@ namespace NoXP.Scrcpy
             }
             return false;
         }
+        private static void CLISelectDevice(bool auto = false)
+        {
+            string input = string.Empty;
+            if (!auto)
+            {
+                Console.WriteLine("Enter the device's index:");
+                Console.WriteLine("[leave blank to use first device in list]");
+                Console.Write("> ");
+                input = Console.ReadLine();
+            }
+            ADBDevice.SelectDevice(input, auto);
+        }
+
+
         private static bool SetTCPIP()
         {
             if (!string.IsNullOrEmpty(Constants.ADB))
@@ -258,21 +274,6 @@ namespace NoXP.Scrcpy
             }
             return false;
         }
-
-        private static void CLISelectDevice(bool auto = false)
-        {
-            string input = string.Empty;
-            if (!auto)
-            {
-                Console.WriteLine("Enter the device's index:");
-                Console.WriteLine("[leave blank to use first device in list]");
-                Console.Write("> ");
-                input = Console.ReadLine();
-            }
-            ADBDevice.SelectDevice(input, auto);
-        }
-
-
         private static bool ConnectADBDeviceOverWifi(ADBDevice device)
         {
             if (!string.IsNullOrEmpty(Constants.ADB))
@@ -290,16 +291,17 @@ namespace NoXP.Scrcpy
             }
             return false;
         }
-        private static bool ConnectScrcpy(ADBDevice device, ScrcpyArguments arguments)
-        {
-            if (!string.IsNullOrEmpty(Constants.SCRCPY))
-            {
-                Process proc = ProcessFactory.CreateProcessScrcpy(arguments.ToString());
-                device.Process = proc;
-                return proc.Start();
-            }
-            return false;
-        }
+
+        //private static bool ConnectScrcpy(ADBDevice device, ScrcpyArguments arguments)
+        //{
+        //    if (!string.IsNullOrEmpty(Constants.SCRCPY))
+        //    {
+        //        Process proc = ProcessFactory.CreateProcessScrcpy(arguments.ToString());
+        //        device.Process = proc;
+        //        return proc.Start();
+        //    }
+        //    return false;
+        //}
 
     }
 

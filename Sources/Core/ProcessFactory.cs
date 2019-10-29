@@ -28,6 +28,10 @@ namespace NoXP.Scrcpy
             }
             return null;
         }
+        public static Process CreateProcessScrcpy(ScrcpyArguments arguments)
+        {
+            return CreateProcessScrcpy(arguments.ToString());
+        }
         public static Process CreateProcessScrcpy(string arguments)
         {
             if (!string.IsNullOrEmpty(Constants.SCRCPY))

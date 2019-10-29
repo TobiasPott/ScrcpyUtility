@@ -21,6 +21,7 @@ namespace NoXP.Scrcpy
         public string IpAddress { get; set; }
 
         public Process Process { get; set; }
+        public ScrcpyArguments Arguments { get; private set; }
 
         public bool IsConnected
         {
@@ -36,25 +37,50 @@ namespace NoXP.Scrcpy
         {
             this.Serial = serial;
             this.Name = name;
+            // assign global arguments on device creation
+            this.SetScrcpyArguments(ScrcpyArguments.Global);
         }
 
+
+        private void SetScrcpyArguments(ScrcpyArguments arguments = null)
+        {
+            if (arguments != null)
+            {
+                this.Arguments = arguments.Clone() as ScrcpyArguments;
+                this.Arguments.Serial = this.Serial;
+            }
+        }
 
         public void Disconnect()
         {
             if (this.IsConnected)
                 this.Process.Kill();
         }
+        public bool Connect(ScrcpyArguments arguments = null)
+        {
+            if (!this.IsConnected && !string.IsNullOrEmpty(Constants.SCRCPY))
+            {
+                this.SetScrcpyArguments(arguments);
+                Process proc = ProcessFactory.CreateProcessScrcpy(this.Arguments);
+                this.Process = proc;
+                return proc.Start();
+            }
+            return false;
+        }
+
         public override string ToString()
         {
             return string.Format("{0}: [{1}] \tIP:{2}", this.Serial, this.IsConnected ? "Connected" : "Disconnected", this.IpAddress);
         }
+
+
 
         public static void SelectDevice(string userInput, bool autoSelect = false)
         {
             // is user input is empty auto select is enabled
             if (string.IsNullOrEmpty(userInput))
                 autoSelect = true;
-            
+
             if (int.TryParse(userInput, out int deviceIndex))
                 SelectDevice(deviceIndex, autoSelect);
             else
