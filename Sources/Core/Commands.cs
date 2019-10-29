@@ -12,6 +12,7 @@ namespace NoXP.Scrcpy
         public const string CMD_List = "list";
         public const string CMD_Select = "select";
         public const string CMD_Connect = "connect";
+        public const string CMD_Reconnect = "reconnect";
         public const string CMD_Clear = "clear";
         public const string CMD_Quit = "quit";
 
@@ -19,9 +20,6 @@ namespace NoXP.Scrcpy
         public const string CMD_SetBitrate = "setBitrate";
         public const string CMD_SetNoControl = "setNoControl";
         public const string CMD_SetTurnScreenOff = "setTurnScreenOff";
-
-
-        //public static ScrcpyArguments Arguments { get; } = new ScrcpyArguments();
 
 
         public static void RunShowHelp()
@@ -56,8 +54,18 @@ namespace NoXP.Scrcpy
             if (ADBDevice.CurrentDevice != null)
             {
                 Console.WriteLine("Trying to connect to: {0}", ADBDevice.CurrentDevice);
-                // pass the global settings to the device as per-device argument editing is not supported for CLI
+                // override device's arguments with current global ones (e.g. update settings)
                 ADBDevice.CurrentDevice.Connect(ScrcpyArguments.Global);
+            }
+            Console.WriteLine();
+        }
+        public static void RunReconnectToDevice()
+        {
+            if (ADBDevice.CurrentDevice != null)
+            {
+                Console.WriteLine("Trying to connect to: {0}", ADBDevice.CurrentDevice);
+                // connect to device using the device's arguments (instead of global on connect)
+                ADBDevice.CurrentDevice.Connect();
             }
             Console.WriteLine();
         }

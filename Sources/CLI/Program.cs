@@ -64,6 +64,9 @@ namespace NoXP.Scrcpy.CLI
                 case Commands.CMD_Connect:
                     Commands.RunConnectToDevice();
                     break;
+                case Commands.CMD_Reconnect:
+                    Commands.RunReconnectToDevice();
+                    break;
                 case Commands.CMD_Clear:
                     Commands.RunClear();
                     break;
