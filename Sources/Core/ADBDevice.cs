@@ -49,6 +49,27 @@ namespace NoXP.Scrcpy
             return string.Format("{0}: [{1}] \tIP:{2}", this.Serial, this.IsConnected ? "Connected" : "Disconnected", this.IpAddress);
         }
 
+        public static void SelectDevice(string userInput, bool autoSelect = false)
+        {
+            // is user input is empty auto select is enabled
+            if (string.IsNullOrEmpty(userInput))
+                autoSelect = true;
+            
+            if (int.TryParse(userInput, out int deviceIndex))
+                SelectDevice(deviceIndex, autoSelect);
+            else
+                SelectDevice(-1, autoSelect);
+        }
+        public static void SelectDevice(int index, bool autoSelect = false)
+        {
+            int currentDeviceIndex = index;
+            if (currentDeviceIndex <= -1 && autoSelect && ADBDevice.NumberOfDevices > 0)
+                currentDeviceIndex = 0;
+
+            if (currentDeviceIndex < 0 || currentDeviceIndex >= ADBDevice.NumberOfDevices)
+                currentDeviceIndex = -1;
+            ADBDevice.SetCurrentDevice(currentDeviceIndex);
+        }
         public static void SetCurrentDevice(int index)
         {
             if (index != -1 && index < ADBDevice.AllDevices.Count)

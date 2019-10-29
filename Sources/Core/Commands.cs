@@ -37,10 +37,11 @@ namespace NoXP.Scrcpy
             Console.WriteLine("  " + CMD_Quit.PadRight(padding) + "\t[Global]: Terminates the application and all running connections to any available device started in this session.");
             Console.WriteLine();
         }
+
         public static void RunSelectDevice(bool auto = false)
         {
             // select device by index (this will be put into a loop later on)
-            Commands.SelectDevice(auto);
+            Commands.CLISelectDevice(auto);
             if (!auto)
             {
                 if (ADBDevice.CurrentDevice != null)
@@ -118,9 +119,11 @@ namespace NoXP.Scrcpy
                     }
                 }
                 ADBDevice.UpdateAllDevices(newDevices);
+                // TODO:
+                //  put this behind a configurable value to allow the user/application to decide whether auto-connect should be used or not
                 // if only one device is available select it as current by default
                 if (ADBDevice.NumberOfDevices == 1)
-                    Commands.RunSelectDevice(true);
+                    ADBDevice.SelectDevice(0);
             }
 
         }
@@ -255,35 +258,21 @@ namespace NoXP.Scrcpy
             }
             return false;
         }
-        private static void SelectDevice(bool auto = false)
+
+        private static void CLISelectDevice(bool auto = false)
         {
+            string input = string.Empty;
             if (!auto)
             {
                 Console.WriteLine("Enter the device's index:");
                 Console.WriteLine("[leave blank to use first device in list]");
                 Console.Write("> ");
+                input = Console.ReadLine();
             }
-            string input = auto ? "" : Console.ReadLine();
-            int currentDeviceIndex = 0;
-            if (string.IsNullOrEmpty(input))
-            {
-                if (ADBDevice.NumberOfDevices > 0)
-                    currentDeviceIndex = 0;
-                else
-                    currentDeviceIndex = -1; // invlaidates the index
-            }
-            else
-            {
-                int deviceIndex = -1;
-                if (int.TryParse(input, out deviceIndex))
-                    currentDeviceIndex = deviceIndex;
-
-                // invalidate index if out ouf device list range
-                if (currentDeviceIndex < 0 || currentDeviceIndex >= ADBDevice.NumberOfDevices)
-                    currentDeviceIndex = -1;
-            }
-            ADBDevice.SetCurrentDevice(currentDeviceIndex);
+            ADBDevice.SelectDevice(input, auto);
         }
+
+
         private static bool ConnectADBDeviceOverWifi(ADBDevice device)
         {
             if (!string.IsNullOrEmpty(Constants.ADB))

@@ -21,7 +21,7 @@ namespace NoXP.Scrcpy.CLI
             Commands.Arguments.MaxSize = 1280;
             // prefills the list of devices available on this machine
             Commands.RunGetAvailableDevices();
-            Commands.RunSelectDevice(true);
+            ADBDevice.SelectDevice("", true);
 
             do
             {
