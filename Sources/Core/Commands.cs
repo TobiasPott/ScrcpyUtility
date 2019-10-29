@@ -39,15 +39,21 @@ namespace NoXP.Scrcpy
         public static void RunSelectDevice(bool auto = false)
         {
             // select device by index (this will be put into a loop later on)
-            Commands.CLISelectDevice(auto);
+            string input = string.Empty;
             if (!auto)
             {
-                if (ADBDevice.CurrentDevice != null)
-                    Console.WriteLine(string.Format("Selected: {0}", ADBDevice.CurrentDevice));
-                else
-                    Console.WriteLine("No device selected.");
-                Console.WriteLine();
+                Console.WriteLine("Enter the device's index:");
+                Console.WriteLine("[leave blank to use first device in list]");
+                Console.Write("> ");
+                input = Console.ReadLine();
             }
+            ADBDevice.SelectDevice(input, auto);
+
+            if (ADBDevice.CurrentDevice != null)
+                Console.WriteLine(string.Format("Selected: {0}", ADBDevice.CurrentDevice));
+            else
+                Console.WriteLine("No device selected.");
+            Console.WriteLine();
         }
         public static void RunConnectToDevice()
         {
@@ -72,8 +78,7 @@ namespace NoXP.Scrcpy
         public static void RunGetAvailableDevices()
         {
             ADBDevice.GetAvailableDevices();
-            Console.WriteLine("Available devices updated.");
-            Console.WriteLine();
+            RunListAvailableDevices();
         }
         public static void RunListAvailableDevices()
         {
@@ -106,132 +111,6 @@ namespace NoXP.Scrcpy
             Console.Clear();
         }
 
-        public static void GetDevicesIpAddress(ADBDevice device)
-        {
-            if (!string.IsNullOrEmpty(Constants.ADB)
-                && device != null)
-            {
-                if (!GetDeviceIpAddressFromIpAddrShow(device))
-                {
-                    // do try to retrieve the ipv4 address via "ip addr show" command (remark: try order was reversed)
-                    GetDeviceIpAddressFromIfconfig(device);
-                }
-
-            }
-        }
-        private static bool GetDeviceIpAddressFromIfconfig(ADBDevice device)
-        {
-
-            if (!string.IsNullOrEmpty(Constants.ADB))
-            {
-                const string InetAddr = "inet addr:";
-                const string Bcast = "Bcast:";
-                const string Denied = "denied";
-                const string Wlan = "wlan";
-
-                string arguments = string.Empty;
-                arguments += string.Format("-s {0} ", device.Serial);
-                arguments += Constants.ADB_COMMAND_SHELL_IFCONFIG;
-
-                Process proc = ProcessFactory.CreateProcessADB(arguments);
-                proc.Start();
-
-                string output = proc.StandardOutput.ReadToEnd().ToLowerInvariant();
-                // check if the result message contains anything with denied in it
-                if (output.Contains(Denied))
-                    return false;
-
-                int indexOfWlan = output.IndexOf(Wlan);
-                int indexOfInetAddr = -1;
-                int indexOfBcast = -1;
-
-                if (indexOfWlan != -1)
-                {
-                    // get index of 'Bcast:' string value
-                    indexOfBcast = output.IndexOf(Bcast, indexOfWlan);
-                    // get index of 'inet addr:' string value
-                    indexOfInetAddr = output.IndexOf(InetAddr, indexOfWlan);
-                    if (indexOfInetAddr != -1)
-                        indexOfInetAddr += InetAddr.Length;
-
-                    // only try retrieve the ip address when the indices are not -1
-                    if (indexOfInetAddr != -1 && indexOfBcast != -1)
-                    {
-                        string ipAddress = output.Substring(indexOfInetAddr, indexOfBcast - indexOfInetAddr).TrimEnd();
-                        device.IpAddress = ipAddress;
-                        return true;
-                    }
-                }
-
-            }
-            return false;
-        }
-        private static bool GetDeviceIpAddressFromIpAddrShow(ADBDevice device)
-        {
-            // ! ! ! !
-            // convert processing of output/input stream to use the event receiver method to hide it's output on the apps console
-            // https://stackoverflow.com/questions/43668920/stop-process-output-from-being-displayed-in-project-command-window
-            // ! ! ! !
-            if (!string.IsNullOrEmpty(Constants.ADB))
-            {
-                const string Inet = "inet";
-                const string Denied = "denied";
-                string ifNameBase = "wlan"; // append interface index to name to iterate over possible available wireless interfaces
-
-
-                for (int i = 0; i < 4; i++)
-                {
-                    string arguments = string.Empty;
-                    arguments += string.Format("-s {0} ", device.Serial);
-                    string ifName = ifNameBase + i.ToString();
-                    arguments += string.Format(Constants.ADB_COMMAND_SHELL_IPADDRSHOW, ifName);
-
-                    Process proc = ProcessFactory.CreateProcessADB(arguments);
-                    proc.Start();
-
-                    string output = proc.StandardOutput.ReadToEnd().ToLowerInvariant();
-                    // check if the result message contains anything with denied in it
-                    if (output.Contains(Denied))
-                        continue;
-
-                    int indexOfInet = output.IndexOf(Inet);
-                    int indexOfIfName = -1;
-
-                    if (indexOfInet != -1)
-                    {
-                        if (indexOfInet != -1)
-                            indexOfInet += Inet.Length;
-
-                        // get index of 'inet' string value
-                        indexOfIfName = output.IndexOf(ifName, indexOfInet);
-                        if (indexOfIfName != -1)
-                        {
-                            string rawLine = output.Substring(indexOfInet, indexOfIfName - indexOfInet).TrimEnd();
-                            int indexOfMask = rawLine.IndexOf('/');
-                            if (indexOfMask != -1)
-                            {
-                                device.IpAddress = rawLine.Substring(0, indexOfMask).Trim();
-                                return true;
-                            }
-                        }
-                    }
-
-                }
-            }
-            return false;
-        }
-        private static void CLISelectDevice(bool auto = false)
-        {
-            string input = string.Empty;
-            if (!auto)
-            {
-                Console.WriteLine("Enter the device's index:");
-                Console.WriteLine("[leave blank to use first device in list]");
-                Console.Write("> ");
-                input = Console.ReadLine();
-            }
-            ADBDevice.SelectDevice(input, auto);
-        }
 
 
         private static bool SetTCPIP()
