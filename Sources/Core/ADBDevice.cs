@@ -20,6 +20,7 @@ namespace NoXP.Scrcpy
         public string Serial { get; }
         public string Name { get; }
         public string IpAddress { get; set; }
+        public ushort Port { get; set; } = 5555;
 
         public Process Process { get; set; }
         public ScrcpyArguments Arguments { get; private set; }
@@ -77,6 +78,56 @@ namespace NoXP.Scrcpy
                     ADBDevice.GetDeviceIpAddressFromIfconfig(this);
             }
         }
+        public bool SetTCPIPMode()
+        {
+            if (!string.IsNullOrEmpty(Constants.ADB))
+            {
+                const string Restarting = "restarting ";
+                string arguments = " -s " + this.Serial + " " + Constants.ADB_COMMAND_TCPIP + " " + this.Port;
+
+                Process proc = ProcessFactory.CreateProcessADB(arguments);
+                proc.Start();
+
+                string output = proc.StandardOutput.ReadToEnd().ToLowerInvariant();
+                if (output.StartsWith(Restarting))
+                    return true;
+            }
+            return false;
+        }
+        public bool SetUSBMode()
+        {
+            if (!string.IsNullOrEmpty(Constants.ADB))
+            {
+                const string Error = "error";
+                string arguments = " -s " + this.Serial + " " + Constants.ADB_COMMAND_USB;
+
+                Process proc = ProcessFactory.CreateProcessADB(arguments);
+                proc.Start();
+
+                string output = proc.StandardOutput.ReadToEnd().ToLowerInvariant();
+                if (!output.ToLowerInvariant().Contains(Error))
+                    return true;
+            }
+            return false;
+        }
+        public bool ConnectADBDeviceOverWifi()
+        {
+            if (!string.IsNullOrEmpty(Constants.ADB))
+            {
+                const string Connected = "connected ";
+                string arguments = Constants.ADB_COMMAND_CONNECT + " " + this.IpAddress + ":" + this.Port;
+
+                Process proc = ProcessFactory.CreateProcessADB(arguments);
+                proc.Start();
+
+                string output = proc.StandardOutput.ReadToEnd().ToLowerInvariant();
+                if (output.StartsWith(Connected))
+                    return true;
+            }
+            return false;
+        }
+
+
 
         public override string ToString()
         {

@@ -111,53 +111,6 @@ namespace NoXP.Scrcpy
             Console.Clear();
         }
 
-
-
-        private static bool SetTCPIP()
-        {
-            if (!string.IsNullOrEmpty(Constants.ADB))
-            {
-                const string Restarting = "restarting ";
-                string arguments = Constants.ADB_COMMAND_TCPIP + " " + Constants.ADB_TCPIP_PORT;
-
-                Process proc = ProcessFactory.CreateProcessADB(arguments);
-                proc.Start();
-
-                string output = proc.StandardOutput.ReadToEnd().ToLowerInvariant();
-                if (output.StartsWith(Restarting))
-                    return true;
-            }
-            return false;
-        }
-        private static bool ConnectADBDeviceOverWifi(ADBDevice device)
-        {
-            if (!string.IsNullOrEmpty(Constants.ADB))
-            {
-                const string Connected = "connected ";
-
-                string arguments = Constants.ADB_COMMAND_CONNECT + " " + device.IpAddress + ":" + Constants.ADB_TCPIP_PORT;
-
-                Process proc = ProcessFactory.CreateProcessADB(arguments);
-                proc.Start();
-
-                string output = proc.StandardOutput.ReadToEnd().ToLowerInvariant();
-                if (output.StartsWith(Connected))
-                    return true;
-            }
-            return false;
-        }
-
-        //private static bool ConnectScrcpy(ADBDevice device, ScrcpyArguments arguments)
-        //{
-        //    if (!string.IsNullOrEmpty(Constants.SCRCPY))
-        //    {
-        //        Process proc = ProcessFactory.CreateProcessScrcpy(arguments.ToString());
-        //        device.Process = proc;
-        //        return proc.Start();
-        //    }
-        //    return false;
-        //}
-
     }
 
 }
