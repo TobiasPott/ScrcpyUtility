@@ -12,12 +12,11 @@ namespace NoXP.Scrcpy
         public const string CMD_Select = "select";
         public const string CMD_Connect = "connect";
         public const string CMD_Reconnect = "reconnect";
+        public const string CMD_Disonnect = "disconnect";
         public const string CMD_Clear = "clear";
         public const string CMD_Quit = "quit";
-
-        // untested
-        public const string CMD_ADBMode_TCPIP = "adbmode-tcpip";
-        public const string CMD_ADBMode_USB = "adbmode-usb";
+        public const string CMD_Mode_TCPIP = "mode-tcpip";
+        public const string CMD_Mode_USB = "mode-usb";
 
         // not implemented
         public const string CMD_SetMaxSize = "setMaxSize";
@@ -34,9 +33,16 @@ namespace NoXP.Scrcpy
             Console.WriteLine("  " + CMD_Get.PadRight(padding) + "\t[Global]: Gets all available devices (via ADB) and updates or retrieves their base information.");
             Console.WriteLine("  " + CMD_List.PadRight(padding) + "\t[Global]: Displays a list of all available devices and their base information and the connection state.");
             Console.WriteLine("  " + CMD_Select.PadRight(padding) + "\t[Global]: Selects a specific one of the available devices and makes it the current one all [Device] commands are run on.");
-            Console.WriteLine("  " + CMD_Connect.PadRight(padding) + "\t[Device]: Connects scrcpy to the current device set by the '" + CMD_Select + "' command.");
             Console.WriteLine("  " + CMD_Clear.PadRight(padding) + "\t[Global]: Clears the current console screen.");
             Console.WriteLine("  " + CMD_Quit.PadRight(padding) + "\t[Global]: Terminates the application and all running connections to any available device started in this session.");
+
+            Console.WriteLine();
+            Console.WriteLine("  " + CMD_Connect.PadRight(padding) + "\t[Device]: Connects scrcpy to the current device set by the '" + CMD_Select + "' command. Uses the global settings.");
+            Console.WriteLine("  " + CMD_Reconnect.PadRight(padding) + "\t[Device]: Connects scrcpy to the current device set by the '" + CMD_Select + "' command. Uses the per-device settings.");
+            Console.WriteLine("  " + CMD_Disonnect.PadRight(padding) + "\t[Device]: Disconnects scrcpy from the current device set by the '" + CMD_Select + "' command.");
+
+            Console.WriteLine("  " + CMD_Mode_TCPIP.PadRight(padding) + "\t[Device]: Changes mode to TCP/IP and allows a WiFi-connection to the device set by the '" + CMD_Select + "' command.");
+            Console.WriteLine("  " + CMD_Mode_USB.PadRight(padding) + "\t[Device]: Changes mode to USB and disables WiFi-connection to the device set by the '" + CMD_Select + "' command.");
             Console.WriteLine();
         }
 
@@ -76,6 +82,16 @@ namespace NoXP.Scrcpy
                 Console.WriteLine("Trying to connect to: {0}", ADBDevice.CurrentDevice);
                 // connect to device using the device's arguments (instead of global on connect)
                 ADBDevice.CurrentDevice.Connect();
+            }
+            Console.WriteLine();
+        }
+        public static void RunDisconnectCurrentDevice()
+        {
+            if (ADBDevice.CurrentDevice != null)
+            {
+                Console.WriteLine("Trying to disconnect: {0}", ADBDevice.CurrentDevice);
+                // override device's arguments with current global ones (e.g. update settings)
+                ADBDevice.CurrentDevice.Disconnect();
             }
             Console.WriteLine();
         }

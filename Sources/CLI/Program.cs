@@ -67,10 +67,13 @@ namespace NoXP.Scrcpy.CLI
                 case Commands.CMD_Reconnect:
                     Commands.RunReconnectToDevice();
                     break;
-                case Commands.CMD_ADBMode_TCPIP:
+                case Commands.CMD_Disonnect:
+                    Commands.RunDisconnectCurrentDevice();
+                    break;
+                case Commands.CMD_Mode_TCPIP:
                     Commands.RunADBModeTCPIP();
                     break;
-                case Commands.CMD_ADBMode_USB:
+                case Commands.CMD_Mode_USB:
                     Commands.RunADBModeUSB();
                     break;
                 case Commands.CMD_Clear:
