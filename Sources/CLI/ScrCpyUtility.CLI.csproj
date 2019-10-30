@@ -25,7 +25,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\ScrcpyUtility.csproj" />
-    <ProjectReference Include="ScrcpyUtility.csproj" />
   </ItemGroup>
 
 </Project>
