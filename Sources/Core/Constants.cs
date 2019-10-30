@@ -20,6 +20,7 @@ namespace NoXP.Scrcpy
 
         public const string ADB_COMMAND_DEVICES = "devices";
         public const string ADB_COMMAND_TCPIP = "tcpip";
+        public const string ADB_COMMAND_USB = "usb";
         public const string ADB_COMMAND_CONNECT = "connect";
         public const string ADB_COMMAND_DISCONNECT = "disconnect";
         public const string ADB_COMMAND_SHELL_IFCONFIG = "shell ifconfig";

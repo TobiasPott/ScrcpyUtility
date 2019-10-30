@@ -1,15 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
-using System.Text;
 
 namespace NoXP.Scrcpy
 {
     public class ProcessFactory
     {
-        public static string BasePath { get; set; } = string.Empty;
+        public static string BasePath { get; private set; } = string.Empty;
 
 
 
@@ -30,6 +27,14 @@ namespace NoXP.Scrcpy
                 return proc;
             }
             return null;
+        }
+        public static Process CreateProcessScrcpy(ScrcpyArguments arguments, string serial = "")
+        {
+            string strArguments = arguments.ToString();
+            if (!string.IsNullOrEmpty(serial))
+                // set serial 
+                strArguments += string.Format(Constants.SCRCPY_ARG_SERIAL, serial);
+            return CreateProcessScrcpy(strArguments);
         }
         public static Process CreateProcessScrcpy(string arguments)
         {
@@ -55,6 +60,24 @@ namespace NoXP.Scrcpy
         }
 
 
+        public static void SetBasePath(string basePath)
+        {
+            if (!string.IsNullOrEmpty(basePath))
+            {
+                ProcessFactory.BasePath = basePath;
+            }
+            else
+                ProcessFactory.BasePath = GetFallbackPath();
+        }
+        private static string GetFallbackPath()
+        {
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                if (RuntimeInformation.OSArchitecture == Architecture.X64)
+                    return "scrcpy-win-x64";
+            }
+            return string.Empty;
+        }
     }
 
 }

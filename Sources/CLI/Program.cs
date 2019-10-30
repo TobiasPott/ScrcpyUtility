@@ -1,7 +1,6 @@
 ﻿using System;
-using System.Runtime.InteropServices;
 
-namespace NoXP.Scrcpy
+namespace NoXP.Scrcpy.CLI
 {
     internal class Program
     {
@@ -13,20 +12,16 @@ namespace NoXP.Scrcpy
             Console.BufferWidth = Math.Min(Console.LargestWindowWidth, 150);
             Console.WindowWidth = Math.Min(Console.LargestWindowWidth, 150);
 
-            if (args.Length > 0)
-                ProcessFactory.BasePath = args[0];
-            else
-                ProcessFactory.BasePath = Program.GetFallbackPath();
-
+            ProcessFactory.SetBasePath(args.Length > 0 ? args[0] : string.Empty);
             Console.WriteLine("Utility is using '" + ProcessFactory.BasePath + "' as the path to your scrcpy-installation.");
 
             // preset the scrcpy arguments with some default values
-            Commands.Arguments.NoControl = false;
-            Commands.Arguments.TurnScreenOff = true;
-            Commands.Arguments.MaxSize = 1280;
+            ScrcpyArguments.Global.NoControl = false;
+            ScrcpyArguments.Global.TurnScreenOff = true;
+            ScrcpyArguments.Global.MaxSize = 1280;
             // prefills the list of devices available on this machine
             Commands.RunGetAvailableDevices();
-            Commands.RunSelectDevice(true);
+            ADBDevice.SelectDevice("", true);
 
             do
             {
@@ -39,7 +34,7 @@ namespace NoXP.Scrcpy
             while (!_command.Equals(Commands.CMD_Quit));
 
             // terminate all scrcpy processes running for available devices
-            foreach (ADBDevice device in ADBDevice.AllDevices)
+            foreach (ADBDevice device in ADBDevice.AllDevicesCollection)
             {
                 if (device.IsConnected)
                 {
@@ -48,16 +43,6 @@ namespace NoXP.Scrcpy
                 }
             }
 
-        }
-
-        private static string GetFallbackPath()
-        {
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-            {
-                if (RuntimeInformation.OSArchitecture == Architecture.X64)
-                    return "scrcpy-win-x64";
-            }
-            return string.Empty;
         }
 
         private static void ProcessCommand(string command)
@@ -78,6 +63,18 @@ namespace NoXP.Scrcpy
                     break;
                 case Commands.CMD_Connect:
                     Commands.RunConnectToDevice();
+                    break;
+                case Commands.CMD_Reconnect:
+                    Commands.RunReconnectToDevice();
+                    break;
+                case Commands.CMD_Disonnect:
+                    Commands.RunDisconnectCurrentDevice();
+                    break;
+                case Commands.CMD_Mode_TCPIP:
+                    Commands.RunADBModeTCPIP();
+                    break;
+                case Commands.CMD_Mode_USB:
+                    Commands.RunADBModeUSB();
                     break;
                 case Commands.CMD_Clear:
                     Commands.RunClear();

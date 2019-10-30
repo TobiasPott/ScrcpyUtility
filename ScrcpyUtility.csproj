@@ -1,21 +1,30 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <OutputType>Exe</OutputType>
-    <TargetFramework>netcoreapp2.2</TargetFramework>
-    <StartupObject>NoXP.Scrcpy.Program</StartupObject>
+    <OutputType>Library</OutputType>
+    <TargetFramework>netcoreapp3.0</TargetFramework>
+    <StartupObject></StartupObject>
     <Platforms>AnyCPU;x64</Platforms>
-    <RuntimeIdentifiers>win10-x64,linux-x64</RuntimeIdentifiers>
     <RootNamespace>NoXP.Scrcpy</RootNamespace>
     <AssemblyName>ScrcpyUtility</AssemblyName>
-    <Version>0.2.0</Version>
+    <Version>0.3.0</Version>
     <Authors>Tobias Pott</Authors>
     <Company>Tobias Pott</Company>
     <Copyright></Copyright>
     <PackageProjectUrl>https://github.com/TobiasPott/ScrcpyUtility</PackageProjectUrl>
     <RepositoryUrl>https://github.com/TobiasPott/ScrcpyUtility</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
+    <ApplicationIcon />
   </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Sources\CLI\**" />
+    <Compile Remove="Sources\UI\**" />
+    <EmbeddedResource Remove="Sources\CLI\**" />
+    <EmbeddedResource Remove="Sources\UI\**" />
+    <None Remove="Sources\CLI\**" />
+    <None Remove="Sources\UI\**" />
+  </ItemGroup>
 
   <ItemGroup>
     <None Update="scrcpy-win-x64\adb.exe">
