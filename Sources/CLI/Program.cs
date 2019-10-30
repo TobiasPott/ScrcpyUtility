@@ -20,7 +20,7 @@ namespace NoXP.Scrcpy.CLI
             ScrcpyArguments.Global.TurnScreenOff = true;
             ScrcpyArguments.Global.MaxSize = 1280;
             // prefills the list of devices available on this machine
-            Commands.RunGetAvailableDevices();
+            Commands.RunListAvailableDevices();
             ADBDevice.SelectDevice("", true);
 
             do
@@ -51,9 +51,6 @@ namespace NoXP.Scrcpy.CLI
             {
                 case Commands.CMD_Help:
                     Commands.RunShowHelp();
-                    break;
-                case Commands.CMD_Get:
-                    Commands.RunGetAvailableDevices();
                     break;
                 case Commands.CMD_List:
                     Commands.RunListAvailableDevices();

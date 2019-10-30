@@ -7,7 +7,6 @@ namespace NoXP.Scrcpy
     public class Commands
     {
         public const string CMD_Help = "help";
-        public const string CMD_Get = "get";
         public const string CMD_List = "list";
         public const string CMD_Select = "select";
         public const string CMD_Connect = "connect";
@@ -30,7 +29,6 @@ namespace NoXP.Scrcpy
             const int padding = 8;
             Console.WriteLine("Command-List:");
             Console.WriteLine("  " + CMD_Help.PadRight(padding) + "\t[Global]: This command, displays a list of available commands.");
-            Console.WriteLine("  " + CMD_Get.PadRight(padding) + "\t[Global]: Gets all available devices (via ADB) and updates or retrieves their base information.");
             Console.WriteLine("  " + CMD_List.PadRight(padding) + "\t[Global]: Displays a list of all available devices and their base information and the connection state.");
             Console.WriteLine("  " + CMD_Select.PadRight(padding) + "\t[Global]: Selects a specific one of the available devices and makes it the current one all [Device] commands are run on.");
             Console.WriteLine("  " + CMD_Clear.PadRight(padding) + "\t[Global]: Clears the current console screen.");
@@ -45,7 +43,36 @@ namespace NoXP.Scrcpy
             Console.WriteLine("  " + CMD_Mode_USB.PadRight(padding) + "\t[Device]: Changes mode to USB and disables WiFi-connection to the device set by the '" + CMD_Select + "' command.");
             Console.WriteLine();
         }
+        public static void RunListAvailableDevices()
+        {
+            ADBDevice.GetAvailableDevices();
+            Console.WriteLine("Devices available on this machine:");
+            if (ADBDevice.AllDevicesCollection.Count() > 0)
+            {
+                // write table header to console
+                string tableHeader = "  " + string.Format("   {0,3}  {1}", "#", string.Format(ADBDevice.FormatString, "Serial", "Mode", "State", "IP"));
+                Console.WriteLine(tableHeader);
+                Console.WriteLine(new String('=', tableHeader.Length));
+                int i = 0;
+                foreach (ADBDevice device in ADBDevice.AllDevicesCollection)
+                {
+                    char selectedMark = ' ';
 
+                    if (device.IsConnected) Console.ForegroundColor = ConsoleColor.Green;
+                    if (ADBDevice.CurrentDevice == device) selectedMark = '*';
+
+                    Console.WriteLine("  " + string.Format(selectedMark + " [{0,3}] {1}", i, device));
+                    Console.ResetColor();
+                    i++;
+                }
+            }
+            else
+            {
+                Console.WriteLine("  No devices connected. Connect an android device with enabled debugging and restart this application.");
+                return;
+            }
+            Console.WriteLine();
+        }
         public static void RunSelectDevice(bool auto = false)
         {
             // select device by index (this will be put into a loop later on)
@@ -95,40 +122,7 @@ namespace NoXP.Scrcpy
             }
             Console.WriteLine();
         }
-        public static void RunGetAvailableDevices()
-        {
-            ADBDevice.GetAvailableDevices();
-            RunListAvailableDevices();
-        }
-        public static void RunListAvailableDevices()
-        {
-            Console.WriteLine("Devices available on this machine:");
-            if (ADBDevice.AllDevicesCollection.Count() > 0)
-            {
-                // write table header to console
-                string tableHeader = "  " + string.Format("   {0,3}  {1}", "#", string.Format(ADBDevice.FormatString, "Serial", "Mode", "State", "IP"));
-                Console.WriteLine(tableHeader);
-                Console.WriteLine(new String('=', tableHeader.Length));
-                int i = 0;
-                foreach (ADBDevice device in ADBDevice.AllDevicesCollection)
-                {
-                    char selectedMark = ' ';
 
-                    if (device.IsConnected) Console.ForegroundColor = ConsoleColor.Green;
-                    if (ADBDevice.CurrentDevice == device) selectedMark = '*';
-
-                    Console.WriteLine("  " + string.Format(selectedMark + " [{0,3}] {1}", i, device));
-                    Console.ResetColor();
-                    i++;
-                }
-            }
-            else
-            {
-                Console.WriteLine("  No devices connected. Connect an android device with enabled debugging and restart this application.");
-                return;
-            }
-            Console.WriteLine();
-        }
         public static void RunClear()
         {
             Console.ResetColor();
@@ -146,6 +140,18 @@ namespace NoXP.Scrcpy
                 ADBDevice.CurrentDevice.ConnectOverUSB();
         }
 
+    }
+
+    public class CommandRegister
+    {
+        public static void Register(ICommand command)
+        {
+
+        }
+        public static void Unregister(ICommand command)
+        {
+
+        }
     }
 
 }
