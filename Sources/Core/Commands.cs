@@ -1,7 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
+using System.Text;
 
 namespace NoXP.Scrcpy
 {
@@ -13,9 +12,13 @@ namespace NoXP.Scrcpy
         public const string CMD_Select = "select";
         public const string CMD_Connect = "connect";
         public const string CMD_Reconnect = "reconnect";
+        public const string CMD_Disonnect = "disconnect";
         public const string CMD_Clear = "clear";
         public const string CMD_Quit = "quit";
+        public const string CMD_Mode_TCPIP = "mode-tcpip";
+        public const string CMD_Mode_USB = "mode-usb";
 
+        // not implemented
         public const string CMD_SetMaxSize = "setMaxSize";
         public const string CMD_SetBitrate = "setBitrate";
         public const string CMD_SetNoControl = "setNoControl";
@@ -30,9 +33,16 @@ namespace NoXP.Scrcpy
             Console.WriteLine("  " + CMD_Get.PadRight(padding) + "\t[Global]: Gets all available devices (via ADB) and updates or retrieves their base information.");
             Console.WriteLine("  " + CMD_List.PadRight(padding) + "\t[Global]: Displays a list of all available devices and their base information and the connection state.");
             Console.WriteLine("  " + CMD_Select.PadRight(padding) + "\t[Global]: Selects a specific one of the available devices and makes it the current one all [Device] commands are run on.");
-            Console.WriteLine("  " + CMD_Connect.PadRight(padding) + "\t[Device]: Connects scrcpy to the current device set by the '" + CMD_Select + "' command.");
             Console.WriteLine("  " + CMD_Clear.PadRight(padding) + "\t[Global]: Clears the current console screen.");
             Console.WriteLine("  " + CMD_Quit.PadRight(padding) + "\t[Global]: Terminates the application and all running connections to any available device started in this session.");
+
+            Console.WriteLine();
+            Console.WriteLine("  " + CMD_Connect.PadRight(padding) + "\t[Device]: Connects scrcpy to the current device set by the '" + CMD_Select + "' command. Uses the global settings.");
+            Console.WriteLine("  " + CMD_Reconnect.PadRight(padding) + "\t[Device]: Connects scrcpy to the current device set by the '" + CMD_Select + "' command. Uses the per-device settings.");
+            Console.WriteLine("  " + CMD_Disonnect.PadRight(padding) + "\t[Device]: Disconnects scrcpy from the current device set by the '" + CMD_Select + "' command.");
+
+            Console.WriteLine("  " + CMD_Mode_TCPIP.PadRight(padding) + "\t[Device]: Changes mode to TCP/IP and allows a WiFi-connection to the device set by the '" + CMD_Select + "' command.");
+            Console.WriteLine("  " + CMD_Mode_USB.PadRight(padding) + "\t[Device]: Changes mode to USB and disables WiFi-connection to the device set by the '" + CMD_Select + "' command.");
             Console.WriteLine();
         }
 
@@ -75,6 +85,16 @@ namespace NoXP.Scrcpy
             }
             Console.WriteLine();
         }
+        public static void RunDisconnectCurrentDevice()
+        {
+            if (ADBDevice.CurrentDevice != null)
+            {
+                Console.WriteLine("Trying to disconnect: {0}", ADBDevice.CurrentDevice);
+                // override device's arguments with current global ones (e.g. update settings)
+                ADBDevice.CurrentDevice.Disconnect();
+            }
+            Console.WriteLine();
+        }
         public static void RunGetAvailableDevices()
         {
             ADBDevice.GetAvailableDevices();
@@ -85,6 +105,10 @@ namespace NoXP.Scrcpy
             Console.WriteLine("Devices available on this machine:");
             if (ADBDevice.AllDevicesCollection.Count() > 0)
             {
+                // write table header to console
+                string tableHeader = "  " + string.Format("   {0,3}  {1}", "#", string.Format(ADBDevice.FormatString, "Serial", "Mode", "State", "IP"));
+                Console.WriteLine(tableHeader);
+                Console.WriteLine(new String('=', tableHeader.Length));
                 int i = 0;
                 foreach (ADBDevice device in ADBDevice.AllDevicesCollection)
                 {
@@ -109,6 +133,17 @@ namespace NoXP.Scrcpy
         {
             Console.ResetColor();
             Console.Clear();
+        }
+
+        public static void RunADBModeTCPIP()
+        {
+            if (ADBDevice.CurrentDevice != null)
+                ADBDevice.CurrentDevice.ConnectOverTCPIP();
+        }
+        public static void RunADBModeUSB()
+        {
+            if (ADBDevice.CurrentDevice != null)
+                ADBDevice.CurrentDevice.ConnectOverUSB();
         }
 
     }
