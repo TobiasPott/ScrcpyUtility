@@ -1,0 +1,32 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFrameworks>netcoreapp2.1;net461</TargetFrameworks>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Update="**\*.xaml.cs">
+      <DependentUpon>%(Filename)</DependentUpon>
+    </Compile>
+    <AvaloniaResource Include="**\*.xaml">
+      <SubType>Designer</SubType>
+    </AvaloniaResource>
+  </ItemGroup>
+  <ItemGroup>
+    <AvaloniaResource Remove="scrcpy-win-x64\**" />
+    <AvaloniaResource Remove="Sources\CLI\**" />
+    <AvaloniaResource Remove="Sources\Core\**" />
+    <Compile Remove="scrcpy-win-x64\**" />
+    <Compile Remove="Sources\CLI\**" />
+    <Compile Remove="Sources\Core\**" />
+    <EmbeddedResource Remove="scrcpy-win-x64\**" />
+    <EmbeddedResource Remove="Sources\CLI\**" />
+    <EmbeddedResource Remove="Sources\Core\**" />
+    <None Remove="scrcpy-win-x64\**" />
+    <None Remove="Sources\CLI\**" />
+    <None Remove="Sources\Core\**" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Avalonia" Version="0.8.0" />
+    <PackageReference Include="Avalonia.Desktop" Version="0.8.0" />
+  </ItemGroup>
+</Project>
