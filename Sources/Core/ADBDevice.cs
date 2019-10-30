@@ -192,8 +192,9 @@ namespace NoXP.Scrcpy
 
 
 
-        public static void SelectDevice(string userInput, bool autoSelect = false)
+        public static void SelectDevice(string userInput)
         {
+            bool autoSelect = false;
             // is user input is empty auto select is enabled
             if (string.IsNullOrEmpty(userInput))
                 autoSelect = true;
