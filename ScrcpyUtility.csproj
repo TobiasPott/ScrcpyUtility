@@ -7,7 +7,7 @@
     <Platforms>AnyCPU;x64</Platforms>
     <RootNamespace>NoXP.Scrcpy</RootNamespace>
     <AssemblyName>ScrcpyUtility</AssemblyName>
-    <Version>0.2.0</Version>
+    <Version>0.3.0</Version>
     <Authors>Tobias Pott</Authors>
     <Company>Tobias Pott</Company>
     <Copyright></Copyright>
