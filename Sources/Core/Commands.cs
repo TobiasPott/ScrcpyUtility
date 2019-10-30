@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Text;
 
 namespace NoXP.Scrcpy
 {
@@ -88,6 +89,10 @@ namespace NoXP.Scrcpy
             Console.WriteLine("Devices available on this machine:");
             if (ADBDevice.AllDevicesCollection.Count() > 0)
             {
+                // write table header to console
+                string tableHeader = "  " + string.Format("   {0,3}  {1}", "#", string.Format(ADBDevice.FormatString, "Serial", "Mode", "State", "IP"));
+                Console.WriteLine(tableHeader);
+                Console.WriteLine(new String('=', tableHeader.Length));
                 int i = 0;
                 foreach (ADBDevice device in ADBDevice.AllDevicesCollection)
                 {
@@ -114,25 +119,17 @@ namespace NoXP.Scrcpy
             Console.Clear();
         }
 
-
-
-
         public static void RunADBModeTCPIP()
         {
             if (ADBDevice.CurrentDevice != null)
-            {
-                ADBDevice.CurrentDevice.SetTCPIPMode();
-                ADBDevice.CurrentDevice.ConnectADBDeviceOverWifi();
-            }
+                ADBDevice.CurrentDevice.ConnectOverTCPIP();
         }
         public static void RunADBModeUSB()
         {
             if (ADBDevice.CurrentDevice != null)
-            {
-                ADBDevice.CurrentDevice.DisconnectADBDeviceOverWifi();
-                ADBDevice.CurrentDevice.SetUSBMode();
-            }
+                ADBDevice.CurrentDevice.ConnectOverUSB();
         }
+
     }
 
 }

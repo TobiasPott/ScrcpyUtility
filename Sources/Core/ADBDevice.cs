@@ -1,18 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 
 namespace NoXP.Scrcpy
 {
     public class ADBDevice
     {
-        private static ADBDevice _currentDevice = null;
+        private static AllocationPool<int> _ports = new AllocationPool<int>(Enumerable.Range(5555, 64));
+
         private static List<ADBDevice> AllDevices { get; } = new List<ADBDevice>();
 
         public static IEnumerable<ADBDevice> AllDevicesCollection { get => AllDevices; }
 
-        public static ADBDevice CurrentDevice
-        { get => _currentDevice; }
+        public static ADBDevice CurrentDevice { get; private set; } = null;
         public static int NumberOfDevices
         { get => AllDevices.Count; }
 
@@ -20,8 +21,10 @@ namespace NoXP.Scrcpy
         public string Serial { get; }
         public string Name { get; }
         public string IpAddress { get; set; }
-        public ushort Port { get; set; } = 5555;
+
         public bool TCPIPEnabled { get; set; } = false;
+        public int Port { get; set; } = -1;
+
 
         public Process Process { get; set; }
         public ScrcpyArguments Arguments { get; private set; }
@@ -79,10 +82,35 @@ namespace NoXP.Scrcpy
                     ADBDevice.GetDeviceIpAddressFromIfconfig(this);
             }
         }
-        public bool SetTCPIPMode()
+
+
+        public bool ConnectOverTCPIP()
+        {
+            if (this.SetTCPIPMode())
+            {
+                if (this.ConnectADBOverTCPIP())
+                    return true;
+                else
+                    this.SetUSBMode();
+            }
+            return false;
+        }
+        public bool ConnectOverUSB()
+        {
+            if (this.DisconnectADBOverTCPIP())
+            {
+                if (this.SetUSBMode())
+                    return true;
+            }
+            return false;
+        }
+        private bool SetTCPIPMode()
         {
             if (!string.IsNullOrEmpty(Constants.ADB))
             {
+                if (this.Port == -1)
+                    this.Port = ADBDevice._ports.Allocate();
+
                 const string Restarting = "restarting ";
                 string arguments = " -s " + this.Serial + " " + Constants.ADB_COMMAND_TCPIP + " " + this.Port;
 
@@ -98,7 +126,7 @@ namespace NoXP.Scrcpy
             }
             return false;
         }
-        public bool SetUSBMode()
+        private bool SetUSBMode()
         {
             if (!string.IsNullOrEmpty(Constants.ADB))
             {
@@ -111,13 +139,14 @@ namespace NoXP.Scrcpy
                 string output = proc.StandardOutput.ReadToEnd().ToLowerInvariant();
                 if (!output.ToLowerInvariant().Contains(Error))
                 {
+                    this.Port = -1;
                     this.TCPIPEnabled = false;
                     return true;
                 }
             }
             return false;
         }
-        public bool ConnectADBDeviceOverWifi()
+        private bool ConnectADBOverTCPIP()
         {
             if (!string.IsNullOrEmpty(Constants.ADB) && this.TCPIPEnabled)
             {
@@ -133,7 +162,7 @@ namespace NoXP.Scrcpy
             }
             return false;
         }
-        public bool DisconnectADBDeviceOverWifi()
+        private bool DisconnectADBOverTCPIP()
         {
             if (!string.IsNullOrEmpty(Constants.ADB) && this.TCPIPEnabled)
             {
@@ -151,10 +180,14 @@ namespace NoXP.Scrcpy
         }
 
 
-
+        public const string FormatString = "{0,-22} {1,-10} {2,-15} {3,-18}";
         public override string ToString()
         {
-            return string.Format("{0}: [{1}] \tIP:{2}", this.Serial, this.IsConnected ? "Connected" : "Disconnected", this.IpAddress);
+            return string.Format(ADBDevice.FormatString,
+                this.Serial,
+                this.TCPIPEnabled ? "TCP/IP" : "USB",
+                this.IsConnected ? "Connected" : "Disconnected",
+                this.IpAddress);
         }
 
 
@@ -183,9 +216,9 @@ namespace NoXP.Scrcpy
         public static void SetCurrentDevice(int index)
         {
             if (index != -1 && index < ADBDevice.AllDevices.Count)
-                _currentDevice = ADBDevice.AllDevices[index];
+                CurrentDevice = ADBDevice.AllDevices[index];
             else
-                _currentDevice = null;
+                CurrentDevice = null;
         }
 
         // TODO:
