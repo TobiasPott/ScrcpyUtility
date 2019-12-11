@@ -2,8 +2,24 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        mc:Ignorable="d" d:DesignWidth="360" d:DesignHeight="640"
-        x:Class="AvaloniaApplication1.MainWindow"
-        Title="AvaloniaApplication1">
-    Welcome to Avalonia!
+        mc:Ignorable="d" Width="360" Height="640"
+        x:Class="NoXP.Scrcpy.UI.MainWindow"
+        Title="Scrcpy UI">
+  <StackPanel Name="StackPanel">
+    <Panel Name="Template" IsVisible="False" HorizontalAlignment="Stretch" Background="LightGray" Margin="4,4,4,4">
+      <TextBlock Margin="4,4,4,4" HorizontalAlignment="Left">Some text</TextBlock>
+      <Button HorizontalAlignment="Right">Click me</Button>
+    </Panel>
+
+    <ItemsControl Name="Items" Items="{Binding Items}">
+      <ItemsControl.ItemTemplate>
+        <DataTemplate>
+
+          <TextBlock Margin="4,4,4,4" HorizontalAlignment="Left" Text="{Binding Serial}"></TextBlock>
+          <Button HorizontalAlignment="Right">Click me</Button>
+          
+        </DataTemplate>
+      </ItemsControl.ItemTemplate>
+    </ItemsControl>
+  </StackPanel>
 </Window>
